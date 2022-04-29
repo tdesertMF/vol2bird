@@ -2690,6 +2690,7 @@ static int readUserConfigOptions(cfg_t** cfg, const char * optsConfFilename) {
         CFG_FLOAT("RADAR_WAVELENGTH_CM",RADAR_WAVELENGTH_CM,CFGF_NONE),
         CFG_BOOL("USE_CLUTTERMAP",USE_CLUTTERMAP,CFGF_NONE),
         CFG_STR("CLUTTERMAP",CLUTTERMAP,CFGF_NONE),
+        CFG_FLOAT("CLUTPERCCELL",CLUTPERCCELL, CFGF_NONE),
         CFG_FLOAT("CLUTTERVALUEMIN",CLUTTERVALUEMIN, CFGF_NONE),
         CFG_BOOL("VERBOSE_OUTPUT_REQUIRED",VERBOSE_OUTPUT_REQUIRED,CFGF_NONE),
         CFG_BOOL("PRINT_DBZ",PRINT_DBZ,CFGF_NONE),
@@ -2729,6 +2730,19 @@ static int readUserConfigOptions(cfg_t** cfg, const char * optsConfFilename) {
         CFG_BOOL("MISTNET_ELEVS_ONLY", MISTNET_ELEVS_ONLY, CFGF_NONE),
         CFG_BOOL("USE_MISTNET", USE_MISTNET, CFGF_NONE),
         CFG_STR("MISTNET_PATH",MISTNET_PATH,CFGF_NONE),
+        CFG_FLOAT("AREACELL",AREACELL,CFGF_NONE),
+        CFG_FLOAT("CHISQMIN",CHISQMIN,CFGF_NONE),
+        CFG_FLOAT("FRINGEDIST",FRINGEDIST,CFGF_NONE),
+        CFG_INT("NBINSGAP",NBINSGAP,CFGF_NONE),
+        CFG_INT("NDBZMIN",NDBZMIN,CFGF_NONE),
+        CFG_INT("NEIGHBORS",NEIGHBORS,CFGF_NONE),
+        CFG_INT("NOBSGAPMIN",NOBSGAPMIN,CFGF_NONE),
+        CFG_INT("NTEXBINAZIM",NTEXBINAZIM,CFGF_NONE),
+        CFG_INT("NTEXBINRANG",NTEXBINRANG,CFGF_NONE),
+        CFG_INT("NTEXMIN",NTEXMIN,CFGF_NONE),
+        CFG_FLOAT("REFRACTIVE_INDEX_OF_WATER",REFRACTIVE_INDEX_OF_WATER,CFGF_NONE),
+        CFG_FLOAT("VDIFMAX",VDIFMAX,CFGF_NONE),
+        CFG_FLOAT("VRADMIN",VRADMIN,CFGF_NONE),
         CFG_END()
     };
     
@@ -4648,20 +4662,20 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
     //              vol2bird options from constants.h                //
     // ------------------------------------------------------------- //
 
-    alldata->constants.areaCellMin = AREACELL;
-    alldata->constants.cellClutterFractionMax = CLUTPERCCELL;
-    alldata->constants.chisqMin = CHISQMIN;
-    alldata->constants.fringeDist = FRINGEDIST;
-    alldata->constants.nBinsGap = NBINSGAP;
-    alldata->constants.nPointsIncludedMin = NDBZMIN;
-    alldata->constants.nNeighborsMin = NEIGHBORS;
-    alldata->constants.nObsGapMin = NOBSGAPMIN;
-    alldata->constants.nAzimNeighborhood = NTEXBINAZIM;
-    alldata->constants.nRangNeighborhood = NTEXBINRANG;
-    alldata->constants.nCountMin = NTEXMIN; 
-    alldata->constants.refracIndex = REFRACTIVE_INDEX_OF_WATER;
-    alldata->constants.absVDifMax = VDIFMAX;
-    alldata->constants.vradMin = VRADMIN;
+    alldata->constants.areaCellMin = cfg_getfloat(*cfg,"AREACELL");
+    alldata->constants.cellClutterFractionMax = cfg_getfloat(*cfg,"CLUTPERCCELL");
+    alldata->constants.chisqMin = cfg_getfloat(*cfg,"CHISQMIN");
+    alldata->constants.fringeDist = cfg_getfloat(*cfg,"FRINGEDIST");
+    alldata->constants.nBinsGap = cfg_getint(*cfg,"NBINSGAP");
+    alldata->constants.nPointsIncludedMin = cfg_getint(*cfg,"NDBZMIN");
+    alldata->constants.nNeighborsMin = cfg_getint(*cfg,"NEIGHBORS");
+    alldata->constants.nObsGapMin = cfg_getint(*cfg,"NOBSGAPMIN");
+    alldata->constants.nAzimNeighborhood = cfg_getint(*cfg,"NTEXBINAZIM");
+    alldata->constants.nRangNeighborhood = cfg_getint(*cfg,"NTEXBINRANG");
+    alldata->constants.nCountMin = cfg_getint(*cfg,"NTEXMIN");
+    alldata->constants.refracIndex = cfg_getfloat(*cfg,"REFRACTIVE_INDEX_OF_WATER");
+    alldata->constants.absVDifMax = cfg_getfloat(*cfg,"VDIFMAX");
+    alldata->constants.vradMin = cfg_getfloat(*cfg,"VRADMIN");
 
     // ------------------------------------------------------------- //
     //       some other variables, derived from user options         //
@@ -4772,7 +4786,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         "resample=%i,resampleRscale=%f,resampleNbins=%i,resampleNrays=%i,"
         "mistNetNElevs=%i,mistNetElevsOnly=%i,useMistNet=%i,mistNetPath=%s,"
     
-        "areaCellMin=%f,cellClutterFractionMax=%f,"
+        "areaCellMin=%f,CLUTPERCCELL=%f,"
         "chisqMin=%f,clutterValueMin=%f,dbzThresMin=%f,"
         "fringeDist=%f,nBinsGap=%i,nPointsIncludedMin=%i,nNeighborsMin=%i,"
         "nObsGapMin=%i,nAzimNeighborhood=%i,nRangNeighborhood=%i,nCountMin=%i,"

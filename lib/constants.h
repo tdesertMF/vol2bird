@@ -4,44 +4,8 @@
 
 #include <float.h>
 
-// when analyzing cells, AREACELL determines the minimum size of a
-// cell to be considered in the rest of the analysis [km^2]
-#define AREACELL 0.5
 // initialization value of rain segmentation field (CELL)
 #define CELLINIT -1
-// minimum standard deviation of the fit
-#define CHISQMIN 1e-5
-// cells with clutter fractions above this value are likely not birds
-#define CLUTPERCCELL 0.5
-// threshold value (on the external static clutter map!) above which gates are excluded as clutter
-#define CLUTTERVALUEMIN 0.1
-// each weather cell identified by findWeatherCells() is grown by a distance
-// equal to 'fringeDist' using a region-growing approach
-#define FRINGEDIST 5000.0
-// when determining whether there are enough vrad observations in
-// each direction, use NBINSGAP sectors
-#define NBINSGAP 8
-// there should be at least NOBSGAPMIN vrad observations in each sector
-#define NOBSGAPMIN 5
-// when calculating the altitude-layer averaged dbz, there should
-// be at least NDBZMIN valid data points
-#define NDBZMIN 25
-// the minimum number of direct neighbors with dbz value above
-// dbzThresMin as used in findWeatherCells()
-#define NEIGHBORS 5
-// vrad's texture is calculated based on the local neighborhood. The
-// neighborhood size in the azimuth direction is equal to NTEXBINAZIM
-// static int nAzimNeighborhood;
-#define NTEXBINAZIM 3
-// vrad's texture is calculated based on the local neighborhood. The
-// neighborhood size in the range direction is equal to NTEXBINRANG
-// static int nRangNeighborhood;
-#define NTEXBINRANG 3
-// the minimum number of neighbors for the texture value to be
-// considered valid, as used in calcTexture()
-#define NTEXMIN 4
-// the refractive index of water
-#define REFRACTIVE_INDEX_OF_WATER 0.964
 // standard refraction coefficient (4/3)
 #define REFRACTION_COEFFICIENT 1.333333f
 // earth's radius (taken from NARR GRIB file)
@@ -52,11 +16,33 @@
 #define RCELLMAX_OFFSET 5000.0f
 // smallest range bin size to accept in metres
 #define RSCALEMIN 10
-// after fitting the vrad data, throw out any vrad observations that are more that VDIFMAX away
-// from the fitted value, since these are likely outliers
-#define VDIFMAX 10.0
-// When analyzing cells, radial velocities lower than VRADMIN are treated as clutter
-#define VRADMIN 1.0
+// default VVP Radial velocity standard deviation threshold S-band (>= 7.5 cm)
+#define STDEV_BIRD_S 1.0f
+// name of (optional) environmental variable containing path to user configuration file
+#define OPTIONS_CONF "OPTIONS_CONF"
+// default user configuration file name to search for in working directory
+#define OPTIONS_FILE "options.conf"
+// FIXME: add description
+#define VERBOSE_OUTPUT_REQUIRED 0
+// print aliased and dealiased vrad pairs to stderr
+#define PRINT_DEALIAS 0
+// print rhohv to stderr
+#define PRINT_RHOHV 0
+// when analyzing cells, only cells for which the stddev of vrad
+// (aka the texture) is less than cellStdDevMax are considered in the
+// rest of the analysis
+#define STDEV_CELL 5.0f
+// minimum dbz of a gate to be considered for inclusion in a weather cell
+#define DBZMIN 0.0
+// whether we should dealias all data once (default), or dealias for each profile individually
+#define DEALIAS_RECYCLE 1
+// Test dealiasing field velocities up to VMAX m/s 
+#define DEALIAS_VMAX 50.0
+// Test field velocities increase in steps VMAX/VAF
+#define DEALIAS_VAF 15.0
+// Test field directions increase by 360/NF degrees
+#define DEALIAS_NF 12.0
+
 
 //-------------------------------------------------------//
 //       hard-coded options for use RSL library          //
@@ -86,6 +72,12 @@
 //-------------------------------------------------------//
 //            MistNet hard-coded options                 //
 //-------------------------------------------------------//
+
+// initializing value of mistnet tensor
+#define MISTNET_INIT 0
+// require that radial velocity and spectrum width pixels rendered as mistnet input
+// have a valid corresponding reflectivity value
+#define MISTNET_REQUIRE_DBZ 0
 // resolution of the Cartesian grid in meter for Mistnet
 #define MISTNET_RESOLUTION 500
 // X and Y dimension of the Cartesian grid for Mistnet,
@@ -159,22 +151,16 @@
 #define USE_CLUTTERMAP 0
 // clutter map path and filename
 #define CLUTTERMAP ""
+// cells with clutter fractions above this value are likely not birds
+#define CLUTPERCCELL 0.5
+// threshold value (on the external static clutter map!) above which gates are excluded as clutter
+#define CLUTTERVALUEMIN 0.1
 // print options to stderr
 #define PRINT_OPTIONS 0
-// name of (optional) environmental variable containing path to user configuration file
-#define OPTIONS_CONF "OPTIONS_CONF"
-// default user configuration file name to search for in working directory
-#define OPTIONS_FILE "options.conf"
-// FIXME: add description
-#define VERBOSE_OUTPUT_REQUIRED 0
 // print dbz to stderr
 #define PRINT_DBZ 0
-// print aliased and dealiased vrad pairs to stderr
-#define PRINT_DEALIAS 0
 // print vrad to stderr
 #define PRINT_VRAD 0
-// print rhohv to stderr
-#define PRINT_RHOHV 0
 // print cell to stderr
 #define PRINT_CELL 0
 // print cell properties to stderr
@@ -195,38 +181,20 @@
 #define MIN_NYQUIST_VELOCITY 5.0f
 // When all scans have nyquist velocity higher than this value, dealiasing is suppressed
 #define MAX_NYQUIST_DEALIAS 25.0f
-// when analyzing cells, only cells for which the stddev of vrad
-// (aka the texture) is less than cellStdDevMax are considered in the
-// rest of the analysis
-#define STDEV_CELL 5.0f
 // default VVP Radial velocity standard deviation threshold C-band (< 7.5 cm)
 #define STDEV_BIRD 2.0f
-// default VVP Radial velocity standard deviation threshold S-band (>= 7.5 cm)
-#define STDEV_BIRD_S 1.0f
 // Bird radar cross section [cm^2]
 #define SIGMA_BIRD 11.0f
 // Maximum mean reflectivity [cm^2/km^3] for cells containing birds
 #define ETACELL 11500.0f
 // Maximum reflectivity [cm^2/km^3] for single gates containing birds
 #define ETAMAX 36000.0f
-// minimum dbz of a gate to be considered for inclusion in a weather cell
-#define DBZMIN 0.0
 // reflectivity quantity to use, one of "DBZH", "DBZV", "TH", "TV"
 #define DBZTYPE "DBZH"
 // for a range gate to contribute it should have a valid radial velocity
 #define REQUIRE_VRAD 0
 // whether we should dealias the radial velocities
 #define DEALIAS_VRAD 1
-// whether we should dealias all data once (default), or dealias for each profile individually
-#define DEALIAS_RECYCLE 1
-// Test dealiasing field velocities up to VMAX m/s 
-#define DEALIAS_VMAX 50.0
-// Test field velocities increase in steps VMAX/VAF
-#define DEALIAS_VAF 15.0
-// Test field directions increase by 360/NF degrees
-#define DEALIAS_NF 12.0
-// whether you want to export the vertical bird profile as JSON
-#define EXPORT_BIRD_PROFILE_AS_JSON 0
 // whether to use dual-pol moments for filtering meteorological echoes
 #define DUALPOL 1
 // whether to use single-pol moments for filtering meteorological echoes
@@ -250,8 +218,40 @@
 #define MISTNET_ELEVS_ONLY 1
 // location of mistnet model in pytorch format
 #define MISTNET_PATH "/MistNet/mistnet_nexrad.pt"
-// initializing value of mistnet tensor
-#define MISTNET_INIT 0
-// require that radial velocity and spectrum width pixels rendered as mistnet input
-// have a valid corresponding reflectivity value
-#define MISTNET_REQUIRE_DBZ 0
+// when analyzing cells, AREACELL determines the minimum size of a
+// cell to be considered in the rest of the analysis [km^2]
+#define AREACELL 0.5
+// minimum standard deviation of the fit
+#define CHISQMIN 1e-5
+// each weather cell identified by findWeatherCells() is grown by a distance
+// equal to 'fringeDist' using a region-growing approach
+#define FRINGEDIST 5000.0
+// when determining whether there are enough vrad observations in
+// each direction, use NBINSGAP sectors
+#define NBINSGAP 8
+// when calculating the altitude-layer averaged dbz, there should
+// be at least NDBZMIN valid data points
+#define NDBZMIN 25
+// the minimum number of direct neighbors with dbz value above
+// dbzThresMin as used in findWeatherCells()
+#define NEIGHBORS 5
+// there should be at least NOBSGAPMIN vrad observations in each sector
+#define NOBSGAPMIN 5
+// vrad's texture is calculated based on the local neighborhood. The
+// neighborhood size in the azimuth direction is equal to NTEXBINAZIM
+// static int nAzimNeighborhood;
+#define NTEXBINAZIM 3
+// vrad's texture is calculated based on the local neighborhood. The
+// neighborhood size in the range direction is equal to NTEXBINRANG
+// static int nRangNeighborhood;
+#define NTEXBINRANG 3
+// the minimum number of neighbors for the texture value to be
+// considered valid, as used in calcTexture()
+#define NTEXMIN 4
+// the refractive index of water
+#define REFRACTIVE_INDEX_OF_WATER 0.964
+// after fitting the vrad data, throw out any vrad observations that are more that VDIFMAX away
+// from the fitted value, since these are likely outliers
+#define VDIFMAX 10.0
+// When analyzing cells, radial velocities lower than VRADMIN are treated as clutter
+#define VRADMIN 1.0
