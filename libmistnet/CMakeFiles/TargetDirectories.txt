@@ -1,0 +1,7 @@
+/home/mdso/desertt/vol2bird/vol2bird/libmistnet/CMakeFiles/install/strip.dir
+/home/mdso/desertt/vol2bird/vol2bird/libmistnet/CMakeFiles/install/local.dir
+/home/mdso/desertt/vol2bird/vol2bird/libmistnet/CMakeFiles/mistnet.dir
+/home/mdso/desertt/vol2bird/vol2bird/libmistnet/CMakeFiles/list_install_components.dir
+/home/mdso/desertt/vol2bird/vol2bird/libmistnet/CMakeFiles/edit_cache.dir
+/home/mdso/desertt/vol2bird/vol2bird/libmistnet/CMakeFiles/rebuild_cache.dir
+/home/mdso/desertt/vol2bird/vol2bird/libmistnet/CMakeFiles/install.dir
