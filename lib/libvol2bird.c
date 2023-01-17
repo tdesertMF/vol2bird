@@ -4860,8 +4860,9 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
 
     // Disable single pol rain filtering for S-band data when dual-pol moments are available
     if(alldata->options.radarWavelength > 7.5 && alldata->options.singlePol && alldata->options.dualPol){
-        fprintf(stderr,"Warning: disabling single-polarization precipitation filter for S-band data, continuing in DUAL polarization mode\n");
-		alldata->options.singlePol = FALSE;
+        //fprintf(stderr,"Warning: disabling single-polarization precipitation filter for S-band data, continuing in DUAL polarization mode\n");
+        //alldata->options.singlePol = FALSE;
+        fprintf(stderr,"Warning: single polarisation shouldn't be available for S-band based on the original vol2bird \n");
     }
 
     // Print warning for S-band in single pol mode

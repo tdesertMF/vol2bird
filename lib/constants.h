@@ -32,8 +32,6 @@
 // (aka the texture) is less than cellStdDevMax are considered in the
 // rest of the analysis
 #define STDEV_CELL 5.0f
-// minimum dbz of a gate to be considered for inclusion in a weather cell
-#define DBZMIN 0.0
 // whether we should dealias all data once (default), or dealias for each profile individually
 #define DEALIAS_RECYCLE 1
 // Test dealiasing field velocities up to VMAX m/s 
@@ -199,6 +197,8 @@
 #define DUALPOL 1
 // whether to use single-pol moments for filtering meteorological echoes
 #define SINGLEPOL 1
+// minimum dbz of a gate to be considered for inclusion in a weather cell
+#define DBZMIN 0.0
 // correlation coefficients higher than this threshold will be classified as precipitation
 #define RHOHVMIN 0.95f
 // whether to resample the input polar volume
