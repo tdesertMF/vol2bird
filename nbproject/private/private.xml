@@ -11,7 +11,9 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>rfs://desertt@svalm1-sidev.meteo.fr:22/home/mdso/desertt/vol2bird/vol2bird/lib/libvol2bird.c</file>
+            <file>rfs://desertt@svalm1-sidev.meteo.fr:22/home/mdso/desertt/vol2bird/vol2bird/vol2bird.sh</file>
             <file>rfs://desertt@svalm1-sidev.meteo.fr:22/home/mdso/desertt/vol2bird/vol2bird/lib/constants.h</file>
+            <file>rfs://desertt@svalm1-sidev.meteo.fr:22/home/mdso/desertt/vol2bird/vol2bird/src/vol2bird.c</file>
         </group>
     </open-files>
 </project-private>

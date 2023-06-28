@@ -390,6 +390,8 @@ static void classifyGatesSimple(vol2bird_t* alldata) {
 
         unsigned int gateCode = 0;
         
+        // We take off the other filter - we keep the hangling of azimuths
+        /*
         if (alldata->options.useClutterMap && clutValue > alldata->options.clutterValueMin) {
             // this gate is true in the static clutter map
             gateCode |= 1<<(alldata->flags.flagPositionStaticClutter);
@@ -426,6 +428,7 @@ static void classifyGatesSimple(vol2bird_t* alldata) {
             // flagPositionVDifMax
         }
 
+        */
         if (alldata->options.azimMin < alldata->options.azimMax){
             if ((azimValue < alldata->options.azimMin) || (azimValue > alldata->options.azimMax)) {
                 // the user can specify to exclude gates based on their azimuth;
@@ -481,6 +484,8 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
                 }
                 
                 // only when dealing with normal (non-dual pol) data, generate a vrad texture field
+                // We take it off to win calculation time
+                /*
 				if (alldata->options.singlePol){
                     // ------------------------------------------------------------- //
                     //                      calculate vrad texture                   //
@@ -490,7 +495,7 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
 
                     calcTexture(scan, scanUse[iScan], alldata);					
 				}
-
+                */
                 int nCells = -1;
 
 				// ------------------------------------------------------------- //
