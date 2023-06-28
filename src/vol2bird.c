@@ -351,6 +351,8 @@ int main(int argc, char** argv) {
         saveToODIM((RaveCoreObject*) volume, fileVolOut);
     }
 
+    // In the light version, we comment passed thios point - we keep the teardown
+    /*
     // call vol2bird's main routine
     vol2birdCalcProfiles(&alldata);
     
@@ -428,6 +430,8 @@ int main(int argc, char** argv) {
         }
     }
     
+    */ 
+   
     // tear down vol2bird, give memory back
     vol2birdTearDown(&alldata);
     RAVE_OBJECT_RELEASE(volume);
