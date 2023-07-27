@@ -1654,7 +1654,7 @@ static void fringeCells(PolarScan_t* scan, vol2bird_t* alldata) {
                     continue; // with the next iGlobal
                 }
                 // include pixel (iRangLocal,iAzimLocal) in fringe
-                cellImage[iLocal] = 1;
+                cellImage[iLocal] = -cellImage[iGlobal];
                 
             } // (iNeighborhood = 0; iNeighborhood < nNeighborhood; iNeighborhood++)
         } // (iRang = 0; iRang < nRang; iRang++)
