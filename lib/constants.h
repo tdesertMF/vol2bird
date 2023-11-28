@@ -13,7 +13,9 @@
 // range gates up to a distance of RANGE_MAX+RCELLMAX_OFFSET are read into memory
 // the extra offset allows for the raincell search to extend somewhat further
 // than the maximum range used in the profile generation (RANGE_MAX).
-#define RCELLMAX_OFFSET 5000.0f
+// UPDATE : we set it to a value above our maximum value of fringes to secure the false 
+// detections of precipitation fringes
+#define RCELLMAX_OFFSET 20000.0f
 // smallest range bin size to accept in metres
 #define RSCALEMIN 10
 // default VVP Radial velocity standard deviation threshold S-band (>= 7.5 cm)
